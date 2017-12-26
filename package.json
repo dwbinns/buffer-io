@@ -1,7 +1,7 @@
 {
   "name": "buffer-io",
   "version": "1.0.0",
-  "description": "",
+  "description": "JavaScript buffer reader and writer",
   "main": "src/index.js",
   "directories": {
     "test": "test"
@@ -14,5 +14,6 @@
   "license": "MIT",
   "devDependencies": {
     "tap": "^10.7.1"
-  }
+  },
+  "repository": "github:dwbinns/buffer-io"
 }
