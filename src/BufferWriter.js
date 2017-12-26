@@ -1,5 +1,6 @@
 const ResizableBuffer = require('./ResizableBuffer');
 const CreatingMap = require('./CreatingMap');
+const asBuffer = require('./asBuffer');
 
 module.exports = class BufferWriter {
     constructor(resizableBuffer=new ResizableBuffer(), start=0, regions=new CreatingMap(()=>new WriterRegion())) {
@@ -7,7 +8,7 @@ module.exports = class BufferWriter {
         this.index=start;
     }
 
-    clone() {
+    subWriter() {
         return new BufferWriter(this.resizableBuffer, this.index, this.regions);
     }
 
@@ -68,5 +69,9 @@ module.exports = class BufferWriter {
 
     getUint8Array() {
         return this.resizableBuffer.uint8array.subarray(this.start, this.index);
+    }
+
+    getBuffer() {
+        return asBuffer(this.getUint8Array());
     }
 }
