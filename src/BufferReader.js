@@ -10,7 +10,7 @@ module.exports = class BufferReader {
         this.index=start;
     }
 
-    clone() {
+    subReader() {
         return new BufferReader(this.uint8array,this.index,this.end,this.regions);
     }
 
