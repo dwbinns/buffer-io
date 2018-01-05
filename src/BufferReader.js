@@ -1,7 +1,6 @@
 const CreatingMap = require('./CreatingMap');
 
-class OverflowError extends Error {
-}
+const OverflowError = require('./OverflowError');
 
 module.exports = class BufferReader {
     constructor(uint8array, start=0, end=uint8array.byteLength, regions=new CreatingMap(()=>new ReaderRegion())) {
