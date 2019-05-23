@@ -1,1 +1,5 @@
-module.exports = class OverflowError {};
+module.exports = class OverflowError extends Error {
+    constructor() {
+        super("Overflow");
+    }
+};
