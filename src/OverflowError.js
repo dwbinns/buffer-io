@@ -1,5 +1,5 @@
 module.exports = class OverflowError extends Error {
-    constructor() {
-        super("Overflow");
+    constructor(message) {
+        super(message);
     }
 };

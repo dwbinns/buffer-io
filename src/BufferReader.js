@@ -24,7 +24,7 @@ module.exports = class BufferReader {
     }
 
     setSize(size) {
-        this.end=this.start+size;
+        this.end = this.start + size;
         this.eat(0);
     }
 
@@ -40,10 +40,15 @@ module.exports = class BufferReader {
         if (this.settings.align && align) {
             this.align(size);
         }
+    }
+    eatAll() {
+        this.index = this.end;
+    }
+
         let index = this.index;
         this.index += size;
-        if (this.index>this.end) {
-            throw new OverflowError();
+        if (this.index > this.end) {
+            throw new OverflowError("Read beyond end");
         }
         return index;
     }
