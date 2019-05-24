@@ -59,17 +59,26 @@ module.exports = class BufferReader {
         else return (BigInt(this.dataView.getUint32(index))<<32n)+BigInt(this.dataView.getUint32(index+4));
     }
 
-    readU32(littleEndian) {
-        return this.dataView.getUint32(this.eat(4, true), littleEndian);
+    readU32LE() {
+        return this.dataView.getUint32(this.eat(4), true);
     }
 
-    readU24(littleEndian) {
-        if (littleEndian) return this.dataView.getUint16(this.eat(2), true) + (this.dataView.getUint8(this.eat(1)) << 16);
-        else return (this.dataView.getUint8(this.eat(1)) << 16)+this.dataView.getUint16(this.eat(2));
+    readU32BE() {
+        return this.dataView.getUint32(this.eat(4));
+    }
+
+    readU24BE() {
+        return (this.dataView.getUint8(this.eat(1)) << 16)+this.dataView.getUint16(this.eat(2));
+    readU24BE() {
+        return (this.dataView.getUint8(this.eat(1)) << 16) + this.dataView.getUint16(this.eat(2));
     }
 
     readU16(littleEndian) {
         return this.dataView.getUint16(this.eat(2, true), littleEndian);
+    }
+
+    readU16LE() {
+        return this.dataView.getUint16(this.eat(2), true);
     }
 
     readU8() {
@@ -85,8 +94,8 @@ module.exports = class BufferReader {
         return result;
     }
 
-    readBytes(size=this.end-this.index) {
-        return this.uint8array.slice(this.eat(size),this.index);
+    readBytes(size = this.end - this.index) {
+        return this.uint8array.slice(this.eat(size), this.index);
     }
 
 }
