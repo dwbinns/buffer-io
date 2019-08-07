@@ -3,16 +3,23 @@ const {TextDecoder} = require('util');
 const OverflowError = require('./OverflowError');
 
 module.exports = class BufferReader {
-    constructor(uint8array, start=0, end=uint8array.byteLength, scope=new Map(), settings={}) {
-        Object.assign(this,{uint8array,end,start,scope});
+    constructor(uint8array, start=0, end=uint8array.byteLength, settings = {littleEndian: false}, name = "") {
+        this.uint8array = uint8array;
+        this.start = start;
+        this.end = end;
         this.dataView = new DataView(this.uint8array.buffer, uint8array.byteOffset, uint8array.byteLength);
         this.index=start;
-        this.settings={...settings};
+        this.settings = settings;
+        this.name = name;
     }
 
+    configure(settings) {
+        Object.assign(this.settings, settings);
+        return this;
+    }
 
-    subReader() {
-        return new BufferReader(this.uint8array,this.index,this.end,this.scope,this.settings);
+    nestedReader(name = this.name) {
+        return new BufferReader(this.uint8array, this.index, this.end, {...this.settings}, name);
     }
 
     getReadSize() {
@@ -36,15 +43,16 @@ module.exports = class BufferReader {
         this.index += (size - this.index % size) % size;
     }
 
-    eat(size, align) {
-        if (this.settings.align && align) {
-            this.align(size);
-        }
-    }
     eatAll() {
         this.index = this.end;
     }
 
+
+    eat(size, align) {
+        if (this.settings.align && align) {
+            this.align(size);
+        }
+   
         let index = this.index;
         this.index += size;
         if (this.index > this.end) {
@@ -53,32 +61,23 @@ module.exports = class BufferReader {
         return index;
     }
 
-    readU64big(littleEndian) {
+    readU64big(littleEndian = this.settings.littleEndian) {
         let index=this.eat(8, true);
         if (littleEndian) return BigInt(this.dataView.getUint32(index, true))+(BigInt(this.dataView.getUint32(index+4, true))<<32n);
         else return (BigInt(this.dataView.getUint32(index))<<32n)+BigInt(this.dataView.getUint32(index+4));
     }
 
-    readU32LE() {
-        return this.dataView.getUint32(this.eat(4), true);
+    readU32(littleEndian = this.settings.littleEndian) {
+        return this.dataView.getUint32(this.eat(4, true), littleEndian);
     }
 
-    readU32BE() {
-        return this.dataView.getUint32(this.eat(4));
+    readU24(littleEndian = this.settings.littleEndian) {
+        if (littleEndian) return this.dataView.getUint16(this.eat(2), true) + (this.dataView.getUint8(this.eat(1)) << 16);
+        else return (this.dataView.getUint8(this.eat(1)) << 16)+this.dataView.getUint16(this.eat(2));
     }
 
-    readU24BE() {
-        return (this.dataView.getUint8(this.eat(1)) << 16)+this.dataView.getUint16(this.eat(2));
-    readU24BE() {
-        return (this.dataView.getUint8(this.eat(1)) << 16) + this.dataView.getUint16(this.eat(2));
-    }
-
-    readU16(littleEndian) {
+    readU16(littleEndian = this.settings.littleEndian) {
         return this.dataView.getUint16(this.eat(2, true), littleEndian);
-    }
-
-    readU16LE() {
-        return this.dataView.getUint16(this.eat(2), true);
     }
 
     readU8() {

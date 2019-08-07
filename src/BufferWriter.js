@@ -3,15 +3,20 @@ const asBuffer = require('./asBuffer');
 const {TextEncoder} = require("util");
 
 module.exports = class BufferWriter {
-    constructor(resizableBuffer=new ResizableBuffer(), start=0, scope = new Map(), settings = {}) {
-        Object.assign(this, {resizableBuffer, start, scope});
+    constructor(resizableBuffer=new ResizableBuffer(), start=0, settings = {littleEndian: false}) {
+        this.resizableBuffer = resizableBuffer;
+        this.start = start;
         this.index=start;
-        this.settings={...settings};
+        this.settings = settings;
     }
 
+    configure(settings) {
+        Object.assign(this.settings, settings);
+        return this;
+    }
 
-    subWriter() {
-        return new BufferWriter(this.resizableBuffer, this.index, this.scope, this.settings);
+    nestedWriter() {
+        return new BufferWriter(this.resizableBuffer, this.index, {...this.settings});
     }
 
     getSize() {
@@ -34,18 +39,12 @@ module.exports = class BufferWriter {
         this.index+=1;
     }
 
-    writeU16(value, littleEndian) {
+    writeU16(value, littleEndian = this.settings.littleEndian) {
         this.ensure(2, true).dataView.setUint16(this.index, value, littleEndian);
         this.index+=2;
     }
 
-    writeU24(value, littleEndian) {
-    writeU16LE(value) {
-        this.ensure(2).dataView.setUint16(this.index, value, true);
-        this.index+=2;
-    }
-
-    writeU24BE(value) {
+    writeU24(value, littleEndian = this.settings.littleEndian) {
         let dataView=this.ensure(3).dataView;
         if (littleEndian) {
             dataView.setUint16(this.index, value & 0xffff, true);
@@ -57,13 +56,13 @@ module.exports = class BufferWriter {
         this.index+=3;
     }
 
-    writeU32(value, littleEndian) {
+    writeU32(value, littleEndian = this.settings.littleEndian) {
         let dataView = this.ensure(4, true).dataView;
         dataView.setUint32(this.index, value, littleEndian);
         this.index+=4;
     }
 
-    writeU64big(value, littleEndian) {
+    writeU64big(value, littleEndian = this.settings.littleEndian) {
         let dataView = this.ensure(8, true).dataView;
         if (littleEndian) {
             dataView.setUint32(this.index, Number(BigInt.asUintN(32, value)), true);
@@ -72,20 +71,6 @@ module.exports = class BufferWriter {
             dataView.setUint32(this.index, Number(BigInt.asUintN(32, value>>32n)));
             dataView.setUint32(this.index+4, Number(BigInt.asUintN(32, value)));
         }
-    writeU64BE(value) {
-        let dataView = this.ensure(8).dataView;
-        dataView.setUint32(this.index, Math.floor(value / 2**32)>>>0);
-        dataView.setUint32(this.index+4, value>>>0);
-    writeU32LE(value) {
-        let dataView = this.ensure(4).dataView;
-        dataView.setUint32(this.index, value, true);
-        this.index+=4;
-    }
-
-    writeU64BE(value) {
-        let dataView = this.ensure(8).dataView;
-        dataView.setUint32(this.index, Math.floor(value / 2**32)>>>0);
-        dataView.setUint32(this.index+4, value>>>0);
         this.index+=8;
     }
 
