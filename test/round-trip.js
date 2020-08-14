@@ -1,9 +1,9 @@
-const tap = require('tap');
+const {deepEqual} = require('assert').strict;
 const {BufferReader, BufferWriter} = require('..');
 
 const testData = [
     ['U64big',0x0123456789ABCDEFn, true],
-    ['U64big',0x0123456789ABCDEFn,false],
+    ['U64big',0x0123456789ABCDEFn, false],
     ['U32',0x23456789,true],
     ['U32',0x23456789,false],
     ['U24',0x334455,true],
@@ -22,4 +22,4 @@ let bufferReader = new BufferReader(bufferWriter.getUint8Array());
 let sourceData = testData.map(([type, value, ...extra]) => [type, value.toString(16), ...extra]);
 let resultData = testData.map(([type, value, ...extra]) => [type, bufferReader[`read${type}`](...extra).toString(16), ...extra]);
 
-tap.same(resultData, sourceData, "Round trip succeeded");
+deepEqual(resultData, sourceData);

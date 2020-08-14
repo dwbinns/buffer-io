@@ -7,13 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap test/*.js"
+    "test": "node test/round-trip.js"
   },
   "keywords": [],
   "author": "David Binns <dwbinnspublic+git@gmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "tap": "^10.7.1"
-  },
   "repository": "github:dwbinns/buffer-io"
 }

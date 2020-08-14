@@ -40,12 +40,6 @@ module.exports = class BufferWriter {
     }
 
     writeU24(value, littleEndian) {
-    writeU16LE(value) {
-        this.ensure(2).dataView.setUint16(this.index, value, true);
-        this.index+=2;
-    }
-
-    writeU24BE(value) {
         let dataView=this.ensure(3).dataView;
         if (littleEndian) {
             dataView.setUint16(this.index, value & 0xffff, true);
@@ -65,28 +59,12 @@ module.exports = class BufferWriter {
 
     writeU64big(value, littleEndian) {
         let dataView = this.ensure(8, true).dataView;
-        if (littleEndian) {
-            dataView.setUint32(this.index, Number(BigInt.asUintN(32, value)), true);
-            dataView.setUint32(this.index+4, Number(BigInt.asUintN(32, value>>32n)), true);
-        } else {
-            dataView.setUint32(this.index, Number(BigInt.asUintN(32, value>>32n)));
-            dataView.setUint32(this.index+4, Number(BigInt.asUintN(32, value)));
-        }
-    writeU64BE(value) {
-        let dataView = this.ensure(8).dataView;
-        dataView.setUint32(this.index, Math.floor(value / 2**32)>>>0);
-        dataView.setUint32(this.index+4, value>>>0);
-    writeU32LE(value) {
-        let dataView = this.ensure(4).dataView;
-        dataView.setUint32(this.index, value, true);
-        this.index+=4;
+        dataView.setBigUint64(this.index, value, littleEndian);
+        this.index += 8;
     }
 
-    writeU64BE(value) {
-        let dataView = this.ensure(8).dataView;
-        dataView.setUint32(this.index, Math.floor(value / 2**32)>>>0);
-        dataView.setUint32(this.index+4, value>>>0);
-        this.index+=8;
+    writeU64(value, littleEndian) {
+        this.writeU64big(new BigInt(value), littleEndian);
     }
 
     writeBytes(uint8array) {
