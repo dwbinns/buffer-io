@@ -9,10 +9,11 @@ npm install buffer-io
 
 ```JavaScript
 const {BufferReader, BufferWriter} = require('buffer-io');
+const data = 0x12345678;
 let bufferWriter = new BufferWriter();
-bufferWriter.writeU32BE(0x12345678);
+bufferWriter.writeU32(0x12345678);
 let bufferReader = new BufferReader(bufferWriter.getUint8Array());
-console.log(bufferReader.readU32BE());
+bufferReader.readU32() == data;
 ```
 
 ## Tests ##

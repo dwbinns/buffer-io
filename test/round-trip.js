@@ -1,4 +1,5 @@
 const {deepEqual} = require('assert').strict;
+const { deepStrictEqual } = require('assert');
 const {BufferReader, BufferWriter} = require('..');
 
 const testData = [
@@ -14,12 +15,15 @@ const testData = [
     ['Bytes',Uint8Array.of(50,60,70)],
 ];
 
-let bufferWriter = new BufferWriter();
-testData.forEach(([type, value, ...extra]) => bufferWriter[`write${type}`](value, ...extra));
+for (let littleEndian of [false, true]) {
+    let bufferWriter = new BufferWriter().configure({littleEndian});
 
-let bufferReader = new BufferReader(bufferWriter.getUint8Array());
+    testData.forEach(([type, value]) => bufferWriter[`write${type}`](value));
 
-let sourceData = testData.map(([type, value, ...extra]) => [type, value.toString(16), ...extra]);
-let resultData = testData.map(([type, value, ...extra]) => [type, bufferReader[`read${type}`](...extra).toString(16), ...extra]);
+    let bufferReader = new BufferReader(bufferWriter.getUint8Array()).configure({littleEndian});
 
-deepEqual(resultData, sourceData);
+    let sourceData = testData.map(([type, value]) => [type, value.toString(16)]);
+    let resultData = testData.map(([type, value]) => [type, bufferReader[`read${type}`]().toString(16)]);
+    deepStrictEqual(resultData, sourceData);
+    console.log(`Round trip succeeded: ${littleEndian ? "little" : "big"}Endian`);
+}
