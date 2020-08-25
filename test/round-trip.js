@@ -1,4 +1,3 @@
-const {deepEqual} = require('assert').strict;
 const { deepStrictEqual } = require('assert');
 const {BufferReader, BufferWriter} = require('..');
 

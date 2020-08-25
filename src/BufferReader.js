@@ -3,14 +3,14 @@ const { TextDecoder } = require('util');
 const OverflowError = require('./OverflowError');
 
 module.exports = class BufferReader {
-    constructor(uint8array, start=0, end=uint8array.byteLength, context = {}, settings = {littleEndian: false}, name = "") {
+    constructor(uint8array, start = 0, end = uint8array.byteLength, context = {}, settings = { littleEndian: false }, name = "") {
         this.uint8array = uint8array;
         this.start = start;
         this.end = end;
         this.dataView = new DataView(this.uint8array.buffer, uint8array.byteOffset, uint8array.byteLength);
-        this.index=start;
-        this.settings = {...settings};
-        this.context = {...context};
+        this.index = start;
+        this.settings = { ...settings };
+        this.context = { ...context };
         this.name = name;
     }
 
@@ -19,7 +19,15 @@ module.exports = class BufferReader {
         return this;
     }
 
-    subReader(name = this.name) {
+    setContext(key, value) {
+        this.context[key] = value;
+    }
+
+    getContext(key) {
+        return this.context[key];
+    }
+
+    here(name = this.name) {
         return new BufferReader(this.uint8array, this.index, this.end, this.context, this.settings, name);
     }
 
@@ -69,9 +77,9 @@ module.exports = class BufferReader {
     }
 
     readU64big(littleEndian = this.settings.littleEndian) {
-        let index=this.eat(8, true);
-        if (littleEndian) return BigInt(this.dataView.getUint32(index, true))+(BigInt(this.dataView.getUint32(index+4, true))<<32n);
-        else return (BigInt(this.dataView.getUint32(index))<<32n)+BigInt(this.dataView.getUint32(index+4));
+        let index = this.eat(8, true);
+        if (littleEndian) return BigInt(this.dataView.getUint32(index, true)) + (BigInt(this.dataView.getUint32(index + 4, true)) << 32n);
+        else return (BigInt(this.dataView.getUint32(index)) << 32n) + BigInt(this.dataView.getUint32(index + 4));
     }
 
     readU32(littleEndian = this.settings.littleEndian) {
@@ -80,7 +88,7 @@ module.exports = class BufferReader {
 
     readU24(littleEndian = this.settings.littleEndian) {
         if (littleEndian) return this.dataView.getUint16(this.eat(2), true) + (this.dataView.getUint8(this.eat(1)) << 16);
-        else return (this.dataView.getUint8(this.eat(1)) << 16)+this.dataView.getUint16(this.eat(2));
+        else return (this.dataView.getUint8(this.eat(1)) << 16) + this.dataView.getUint16(this.eat(2));
     }
 
     readU16(littleEndian = this.settings.littleEndian) {

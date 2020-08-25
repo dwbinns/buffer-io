@@ -3,11 +3,12 @@ const asBuffer = require('./asBuffer');
 const {TextEncoder} = require("util");
 
 module.exports = class BufferWriter {
-    constructor(resizableBuffer=new ResizableBuffer(), start=0, settings = {littleEndian: false}) {
+    constructor(resizableBuffer=new ResizableBuffer(), start=0, context = {}, settings = {littleEndian: false}) {
         this.resizableBuffer = resizableBuffer;
         this.start = start;
         this.index=start;
-        this.settings = settings;
+        this.context = { ...context };
+        this.settings = { ...settings };
     }
 
     configure(settings) {
@@ -15,8 +16,8 @@ module.exports = class BufferWriter {
         return this;
     }
 
-    nestedWriter() {
-        return new BufferWriter(this.resizableBuffer, this.index, {...this.settings});
+    here() {
+        return new BufferWriter(this.resizableBuffer, this.index, this.context, this.settings);
     }
 
     getSize() {
