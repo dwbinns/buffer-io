@@ -21,6 +21,7 @@ module.exports = class BufferReader {
 
     setContext(key, value) {
         this.context[key] = value;
+        return this;
     }
 
     getContext(key) {
@@ -29,6 +30,13 @@ module.exports = class BufferReader {
 
     here(name = this.name) {
         return new BufferReader(this.uint8array, this.index, this.end, this.context, this.settings, name);
+    }
+
+    nest(callback) {
+        let nested = this.here();
+        let result = callback(nested);
+        this.eat(nested.getReadSize());
+        return result;
     }
 
     getReadSize() {
