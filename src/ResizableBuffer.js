@@ -2,7 +2,7 @@ function asDataView(uint8array) {
     return new DataView(uint8array.buffer, uint8array.byteOffset, uint8array.byteLength);
 }
 
-module.exports = class ResizableBuffer {
+export default class ResizableBuffer {
     constructor(initialCapacity=256) {
         this.get(initialCapacity);
     }

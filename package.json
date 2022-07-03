@@ -2,15 +2,19 @@
   "name": "buffer-io",
   "version": "2.0.0",
   "description": "JavaScript buffer reader and writer",
-  "main": "src/index.js",
+  "exports": "./src/index.js",
   "directories": {
     "test": "test"
   },
+  "type": "module",
   "scripts": {
     "test": "node test/round-trip.js"
   },
   "keywords": [],
   "author": "David Binns <dwbinnspublic+git@gmail.com>",
   "license": "MIT",
-  "repository": "github:dwbinns/buffer-io"
+  "repository": "github:dwbinns/buffer-io",
+  "devDependencies": {
+    "md-js-run": "^1.0.1"
+  }
 }

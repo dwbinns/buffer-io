@@ -1,12 +1,12 @@
-const ResizableBuffer = require('./ResizableBuffer');
-const asBuffer = require('./asBuffer');
-const {TextEncoder} = require("util");
+import ResizableBuffer from './ResizableBuffer.js';
+import asBuffer from './asBuffer.js';
 
-module.exports = class BufferWriter {
-    constructor(resizableBuffer=new ResizableBuffer(), start=0, context = {}, settings = {littleEndian: false}) {
+
+export default class BufferWriter {
+    constructor(resizableBuffer = new ResizableBuffer(), start = 0, context = {}, settings = { littleEndian: false }) {
         this.resizableBuffer = resizableBuffer;
         this.start = start;
-        this.index=start;
+        this.index = start;
         this.context = { ...context };
         this.settings = { ...settings };
     }
@@ -21,7 +21,7 @@ module.exports = class BufferWriter {
     }
 
     getSize() {
-        return this.index-this.start;
+        return this.index - this.start;
     }
 
     align(size) {
@@ -32,35 +32,35 @@ module.exports = class BufferWriter {
         if (this.settings.align && align) {
             this.align(size);
         }
-        return this.resizableBuffer.get(size+this.index);
+        return this.resizableBuffer.get(size + this.index);
     }
 
     writeU8(value) {
         this.ensure(1).dataView.setUint8(this.index, value);
-        this.index+=1;
+        this.index += 1;
     }
 
     writeU16(value, littleEndian = this.settings.littleEndian) {
         this.ensure(2, true).dataView.setUint16(this.index, value, littleEndian);
-        this.index+=2;
+        this.index += 2;
     }
 
     writeU24(value, littleEndian = this.settings.littleEndian) {
-        let dataView=this.ensure(3).dataView;
+        let dataView = this.ensure(3).dataView;
         if (littleEndian) {
             dataView.setUint16(this.index, value & 0xffff, true);
-            dataView.setUint8(this.index+2, value>>16);
+            dataView.setUint8(this.index + 2, value >> 16);
         } else {
-            dataView.setUint8(this.index, value>>16);
-            dataView.setUint16(this.index+1, value & 0xffff);
+            dataView.setUint8(this.index, value >> 16);
+            dataView.setUint16(this.index + 1, value & 0xffff);
         }
-        this.index+=3;
+        this.index += 3;
     }
 
     writeU32(value, littleEndian = this.settings.littleEndian) {
         let dataView = this.ensure(4, true).dataView;
         dataView.setUint32(this.index, value, littleEndian);
-        this.index+=4;
+        this.index += 4;
     }
 
     writeU64big(value, littleEndian = this.settings.littleEndian) {
@@ -72,7 +72,7 @@ module.exports = class BufferWriter {
 
     writeBytes(uint8array) {
         this.ensure(uint8array.byteLength).uint8array.set(uint8array, this.index);
-        this.index+=uint8array.length;
+        this.index += uint8array.length;
     }
 
     writeCString(text) {
@@ -81,11 +81,11 @@ module.exports = class BufferWriter {
     }
 
     skip(count) {
-        this.index+=count;
+        this.index += count;
     }
 
     padAlign(alignment) {
-        this.index += alignment - ((index+alignment-1) % alignment)-1;
+        this.index += alignment - ((index + alignment - 1) % alignment) - 1;
     }
 
     getUint8Array() {

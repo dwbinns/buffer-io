@@ -1,8 +1,7 @@
-const CreatingMap = require('./CreatingMap');
-const { TextDecoder } = require('util');
-const OverflowError = require('./OverflowError');
 
-module.exports = class BufferReader {
+import OverflowError from './OverflowError.js';
+
+export default class BufferReader {
     constructor(uint8array, start = 0, end = uint8array.byteLength, context = {}, settings = { littleEndian: false }, name = "") {
         this.uint8array = uint8array;
         this.start = start;
