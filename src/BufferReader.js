@@ -93,6 +93,10 @@ export default class BufferReader {
         return this.dataView.getUint32(this.eat(4, true), littleEndian);
     }
 
+    readS32(littleEndian = this.settings.littleEndian) {
+        return this.dataView.getInt32(this.eat(4, true), littleEndian);
+    }
+
     readU24(littleEndian = this.settings.littleEndian) {
         if (littleEndian) return this.dataView.getUint16(this.eat(2), true) + (this.dataView.getUint8(this.eat(1)) << 16);
         else return (this.dataView.getUint8(this.eat(1)) << 16) + this.dataView.getUint16(this.eat(2));
@@ -108,10 +112,14 @@ export default class BufferReader {
     }
 
     readCString() {
-        let end = this.uint8array.indexOf(0, this.index);
+        return new TextDecoder().decode(this.readDelimited(0));
+    }
+
+    readDelimited(terminal) {
+        let end = this.uint8array.indexOf(terminal, this.index);
         if (end < 0) throw new OverflowError();
         let size = end - this.index;
-        let result = new TextDecoder().decode(this.readBytes(size));
+        let result = this.readBytes(size);
         this.eat(1);
         return result;
     }

@@ -63,6 +63,12 @@ export default class BufferWriter {
         this.index += 4;
     }
 
+    writeS32(value, littleEndian = this.settings.littleEndian) {
+        let dataView = this.ensure(4, true).dataView;
+        dataView.setInt32(this.index, value, littleEndian);
+        this.index += 4;
+    }
+
     writeU64big(value, littleEndian = this.settings.littleEndian) {
         let dataView = this.ensure(8, true).dataView;
         dataView.setBigUint64(this.index, value, littleEndian);
